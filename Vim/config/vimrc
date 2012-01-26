@@ -4,8 +4,8 @@
 
 ""  Home URL:       http://keyjunkie.blogspot.com
 ""  Creation Date:  Mon May 09 2005, 18:39:38 UTC-5
-""  Last Revision:	Wed Jan 25 2012, 17:21:11 UTC-5
-""  Version ID:		120125
+""  Last Revision:	Thu Jan 26 2012, 15:31:04 UTC-5
+""  Version ID:		120126
 
 ""  ----------------------------------------------------- 
 ""  Copyright (C) 2005  Mario García H.
@@ -150,8 +150,8 @@ endfun
 
 
 function! MyChangelogSKEL()
-    " This function takes program name from the working
-    " directory, much better if created 'chdir' in it...
+    " This function takes the program name from the working
+    " directory, much better if i'd created 'chdir' in it...
     
     if &ro != 0 "VIM 7.3a bug with ro files...
         " Set anglocentric local (it has to be hardcoded... AFAIK)
