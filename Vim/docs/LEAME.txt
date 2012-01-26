@@ -1,0 +1,34 @@
+= Guía para contribuir =
+
+* Lo importante es el aspecto pedagógico: **explicar menos es más**.
+  El usuario empezará su propio camino y encontrará aquello con lo
+  que siente más comodidad.
+  
+* Intenta no usar comandos oscuros o abreviaturas difíciles de
+  memorizar si no se necesitan:
+  Vim tiene dos puntos fuertes: Evita el uso de la rata (mouse) y
+  combinaciones de teclado absurdas (ej. Richard Stallman, creador
+  de Emacs, sufre de síndrome de tunel carpiano)  Esta guía debe
+  impulsar -forzar si se quiere- al usuario para que entienda y use
+  el teclado correctamente más allá de enseñar Vim.  Por favor, no
+  sugieras combinaciones absurdas. ej. del tipo Emacs.
+
+* Si crees que algo es un error, publica tu sugerencia y discutela
+  primero. Luego ayuda a corregirlo.
+
+* La sección "locos comandos de acción" puede expandirse
+  indefinidamente, en tanto los comandos sean locos y ofrezcan
+  el tipo de acción que sólo encontrarás en el cine o en Vim.
+  Dado que esto es una guía, la idea es estimular al usuario
+  demostrando el poder y sencillez conceptual del editor.
+
+* Intenta mantener el formato actual -en el aspecto visual y
+  en la escritura-
+
+* Cuida el uso del lenguaje lo más posible e intenta que se
+  conserve neutro: No se aceptan regionalismos, o usos arbitrarios
+  de género como "el computador" (término usado en algunos países
+  de América Latina).
+
+
+%% vim:ft=vimwiki:tw=67:ts=4:wrap:wrapscan:norl:

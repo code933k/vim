@@ -1,0 +1,927 @@
+""  -----------------------------------------------------
+""  Vi iMproved configuration file for *nix et al
+""  -----------------------------------------------------
+
+""  Home URL:       http://keyjunkie.blogspot.com
+""  Creation Date:  Mon May 09 2005, 18:39:38 UTC-5
+""  Last Revision:	Wed Jan 25 2012, 17:21:11 UTC-5
+""  Version ID:		120125
+
+""  ----------------------------------------------------- 
+""  Copyright (C) 2005  Mario García H.
+""  Verbatim copying and redistribution of this contents
+""  are permitted provided this notice is preserved
+""
+""  THIS CONTENTS ARE PROVIDED AS-IS
+""  THERE IS NO WARRANTY, TO THE EXTENT PERMITTED BY LAW.
+""  -----------------------------------------------------
+
+
+""" SECTION 0: Info keept from accidental publication
+
+if $UID != '0'
+    source ~/.vimrc.twitvim
+    source ~/.vimrc.userinfo
+    source ~/.vimrc.snippmate
+endif
+
+
+
+""" SECTION 1: Dynamic titles for GNU/Screen & tmux
+
+let &titlestring = "vim \(" . expand('%:t') . "\)"
+
+function! MyTitle()
+    if &term =~? 'screen'
+        set t_ts=k
+        set t_fs=\
+    endif
+    set title
+endfun
+
+autocmd! BufEnter,BufNewFile * call MyTitle()
+
+
+function! RecordCursor()
+    " VIM TIP
+    " Some GNU/Linux distros don't recall last
+    " position from edited files (i.e., Debian)
+    if line("'\"") <= line("$")
+        normal! g`"
+        return 1
+    endif
+endfunction
+
+augroup recallPosition
+    autocmd!
+    autocmd BufWinEnter * call RecordCursor()
+augroup END
+
+
+
+""" SECTION 2: Skeletons (templates)
+
+function! MyProgramHeaders(progtype)
+    let g:myprogramheaders = 1 " Do not execute twice
+    let comment = '#'
+    let sizeoff = getfsize(expand('%f'))
+
+    if getcwd()
+        echo 'Cannot identify working directory.'
+        return 1
+    endif
+
+    if sizeoff > 100 || sizeoff < -1
+    " Files beyond this sizes don't need any headers
+        return 0
+    endif
+
+    if a:progtype == 'sh'
+        0put = '#!/bin/sh'
+        1r $HOME/.vim/skeletons/progs
+    elseif a:progtype == 'awk'
+        0put = '#!/bin/awk -f'
+        1r $HOME/.vim/skeletons/progs
+        exe '%s/PRG_LANGUAGE/\[g\|m\]awk/ge'
+    elseif a:progtype == 'lua'
+        let comment = '--'
+        0put = '#!/usr/bin/env lua'
+        1r $HOME/.vim/skeletons/progs
+    elseif a:progtype == 'haskell'
+        let comment = '--'
+        0put = '#!/usr/bin/env runhaskell'
+        1r $HOME/.vim/skeletons/progs
+    elseif a:progtype == 'perl'
+        0put = '#!/usr/bin/env perl -W'
+        1r $HOME/.vim/skeletons/progs
+    elseif a:progtype == 'python'
+        0put = '#!/usr/bin/env python'
+        1put = '# -*- coding: latin-1 -*-'
+        2r $HOME/.vim/skeletons/progs
+    elseif a:progtype == 'spec'
+	    0r ~/.vim/skeletons/spec
+	    language time en_US.UTF-8
+	    exe "%s//" . strftime("%a\ %b\ %d\ %Y") . "/ge"
+	    exe "%s/specRPM_CREATION_NAME/" . 
+                    \ expand("%:t:r") . "/ge"
+	    setf spec
+    endif
+
+    " Set anglocentric local
+    " for Debian .UTF-8; Fedora .utf8
+    language time en_US.UTF-8
+
+    exe '%s/PRG_NAME/' . expand('%:t:r') . '/ge'
+    exe "%s/PRG_LANGUAGE/ghc (Haskell)/ge"
+    exe "%s/PRG_CREATION_DATE/" . 
+                \ strftime("%a\ %b\ %d\ %Y,\ %H:%M:%S UTC-5") . "/ge"
+    exe "%s/PRG_CREATION_YEAR/" . 
+                \ strftime("%Y") . "/ge"
+    exe '%s/PRG_COMMENT/' . comment . '/ge'
+
+    " Restore original local (for files in Spanish)
+    language time es_CO.UTF-8
+
+    normal 26G
+endfun
+
+
+function! MyHTML_Align()
+	" Tidy up XML/HTML code!
+	set shiftwidth=2
+	set tabstop=2
+    silent normal gg=G
+    " undo
+    echo ' --[HTML TIDYFIED]-- '
+endfun
+
+
+function! WikiColorScheme()
+    let g:vimwiki_hl_headers = 1
+    let g:vimwiki_hl_cb_checked = 1
+    hi VimwikiHeader1 guifg=#DA4939 ctermfg=167
+    hi VimwikiHeader2 guifg=#6D9CBE ctermfg=73
+    hi VimwikiHeader3 guifg=#BC9458 ctermfg=180
+    hi VimwikiHeader4 guifg=#CC7833 ctermfg=173
+    hi VimwikiHeader5 guifg=#FFC66D ctermfg=221
+    hi VimwikiHeader6 guifg=#00FFFF ctermfg=180
+    return 0
+endfun
+
+
+function! MyChangelogSKEL()
+    " This function takes program name from the working
+    " directory, much better if created 'chdir' in it...
+    
+    if &ro != 0 "VIM 7.3a bug with ro files...
+        " Set anglocentric local (it has to be hardcoded... AFAIK)
+        " for Debian .UTF-8; Fedora .utf8
+        language time en_US.UTF-8
+
+        0r ~/.vim/skeletons/ChangeLog
+        let prog = system("printf $(basename $PWD)")
+        exe "%s/PRG_NAME/" . prog . "/ge"
+        exe "%s/PRG_MODIFIED_BY/" . g:user_name . "/ge"
+        exe "%s/PRG_USER_EMAIL/" . g:mail_addr . "/ge"
+        exe "%s/PRG_DATE_NOW/" .
+            \ strftime("%a\ %b\ %d\ %Y\,\ %H:%M:%S", 
+            \ getftime( prog )) . "/ge"
+
+        " Restore -my- original local
+        language time es_CO.UTF-8
+    else
+        return 1
+    endif
+endfun
+
+
+function! MyVariableSkels()
+    if exists ("g:myprogramheaders")
+        return 0
+    endif
+
+    autocmd!
+    autocmd FileType mail       call Mail_Style()
+	autocmd FileType sh         call MyProgramHeaders('sh')
+	autocmd FileType awk        call MyProgramHeaders('awk')
+	autocmd FileType lua        call MyProgramHeaders('lua')
+	autocmd FileType perl       call MyProgramHeaders('perl')
+	autocmd FileType spec       call MyProgramHeaders('spec')
+	autocmd FileType python	    call MyProgramHeaders('python')
+	autocmd FileType haskell    call MyProgramHeaders('haskell')
+    autocmd FileType changelog  call MyChangelogSKEL()
+    autocmd FileType xdefaults  set makeprg=xrdb\ -merge\ '%:~'
+
+    syntax enable
+endfun
+
+augroup progs
+    " Program headers based on centralized 'progs' skeleton
+    autocmd!
+	autocmd BufNewFile *.sh   call MyProgramHeaders('sh')
+	autocmd BufNewFile *.pl   call MyProgramHeaders('perl')
+	autocmd BufNewFile *.lua  call MyProgramHeaders('lua')
+	autocmd BufNewFile *.py   call MyProgramHeaders('python')
+	autocmd BufNewFile *.hs   call MyProgramHeaders('haskell')
+	autocmd BufNewFile *.awk  call MyProgramHeaders('awk')
+	autocmd BufNewFile *.spec call MyProgramHeaders('spec')
+	autocmd BufNewFile *.rem  setf remind
+
+	autocmd BufNewFile,BufRead *.hgrc,*hgrc setf cfg
+	autocmd BufNewFile,BufRead TODO        setf vimwiki
+	autocmd BufNewFile,BufRead README*     setf vimwiki
+    autocmd BufNewFile       ChangeLog     call MyChangelogSKEL()
+
+    autocmd FileType   vimwiki call WikiColorScheme()         
+    autocmd FileType   xml exe
+                \ ":silent 1,$!xmllint --format" .
+                \ " --recover - 2>/dev/null"
+
+	" Files without extension will resolve by filetype
+	" i.e., vim -c ':setf sh' whatever_filename
+	autocmd BufNewFile * call MyVariableSkels()
+augroup END
+
+
+augroup taggems
+    " Centralized and automated ctags just for the kind of
+    " archives I want to. More convenient than brute force
+    " ctags -R...
+    autocmd!
+    autocmd BufRead,FileChangedShell,FileType
+                \ haskell,vim,perl,python,c,c++
+                \ silent !/usr/bin/ctags
+                \ --append=yes
+                \ --file-scope=no
+                \ --tag-relative=no
+                \ -f ~/.local/cache/ctags/common '%:~'
+
+    " Must enforce some languages as ctags is kind of dummy
+    autocmd BufReadPost,FileChangedShell,FileType sh
+                \ silent !/usr/bin/ctags
+                \ --append=yes
+                \ --tag-relative=no
+                \ --language-force=Sh
+                \ -f ~/.local/cache/ctags/common '%:~'
+augroup END
+
+
+function! VersionID()
+    echo strftime("%y\%m\%d")
+    return 0
+endfun
+
+
+function! MyLastMod()
+    " Set Last Modification date+time for source code
+    normal ml
+    let ln = line("$") > 30 ? 30 : line("$")
+
+    lan time es_CO.UTF-8
+    " Format time in Spanish language (local, for me)
+    silent! exe "1," . ln . 
+                \ "s/Editado\:.*/Editado\:\t" .
+                \ strftime("%A\, %B\ %d\ %Y\.\ %H:%M:%S")
+
+    silent! exe "1," . ln . 
+                \ "s/Última Revisión\:.*/Última Revisión\:\t" .
+                \ strftime("%a\ %b\ %d\ %Y\,\ %H:%M:%S " .
+                \ g:tzone)
+
+    " for Debian .UTF-8; Fedora .utf8
+    lan time en_US.UTF-8
+
+    silent! exe "1," . ln . 
+                \ "s/Modified\:.*/Modified\:\t" .
+                \ strftime("%a\ %b\ %d\ %Y\,\ %H:%M:%S " .
+                \ g:tzone)
+
+    silent! exe "1," . ln . 
+                \ "s/Last Revision\:.*/Last Revision\:\t" .
+                \ strftime("%a\ %b\ %d\ %Y\,\ %H:%M:%S " .
+                \ g:tzone)
+
+    " date based versioning reflects changes nicely
+    silent! exe "1," . ln . 
+                \ "s/Version ID\:.*/Version ID\:\t\t" . 
+                \ strftime("%y\%m\%d")
+
+    normal g`l
+    delmarks l
+
+    " Restore original local format 
+    lan time es_CO.UTF-8
+endfun
+
+
+function! License(src)
+    " Get license terms when editing files
+    if a:src == 'gpl'
+	    r ~/.vim/skeletons/gpl-3.0.txt
+        return 0
+    elseif a:src == 'bwr'
+	    r ~/.vim/skeletons/beerware.txt
+        return 0
+    elseif a:src == 'vbt'
+	    r ~/.vim/skeletons/verbatim.txt
+        return 0
+    elseif a:src == 'tac'
+	    r ~/.vim/skeletons/anticonservatives.txt
+        return 0
+    elseif a:src == 'tms'
+	    r ~/.vim/skeletons/termsofuse.txt
+        return 0
+    endif
+endfun
+
+command! GPL        :call License('gpl')
+command! Beerware   :call License('bwr')
+command! Verbatim   :call License('vbt')
+command! AntiCons   :call License('tac')
+command! TermsOfU   :call License('tms')
+
+
+" Using mailx is a lot of fun with vim!
+" If wondering what lifehacks is, check out my repo.
+function! Mail_Sign()
+    if &compatible == 0 " Vim 7.3 bug
+        r !cat $(dirname "$LIFEHACKS")/_/mail_signature
+        normal G
+        r !fortune -s 2>/dev/null
+        return 0
+    endif
+endfun
+
+
+" Fast set paste/nopaste binded to <F12> below
+function! Toggle_Paste()
+    if &paste == 0
+        :set paste
+        echo '  --(PASTE)-- Clipboard copying'
+    else
+        :set nopaste
+        echo ' --(NOPASTE)-- Coding and tabbing'
+    endif
+endfun
+
+
+" Just for getting one more line
+" when status line is of no use
+function! Toggle_StatusLine()
+    if &laststatus == 2
+        set laststatus=1
+    else
+        set laststatus=2
+    endif
+endfun
+
+
+
+""" SECTION 3. Some filetype additions
+
+autocmd BufWritePre,FileWritePre * call MyLastMod()
+autocmd BufReadPost *.pdf 
+            \ silent %!pdftotext -nopgbrk "%" - |fmt -csw78
+
+
+function! Toggle_Spell()
+    let l:cft = &ft     " By reasingning this, we ensure
+    setf text           " proper spell highlighting.
+
+    if (g:spell_Toggle == 'es')
+        let g:spell_Toggle = 'en'
+        set spell spelllang=en
+        echo 'Spell switched to EN (English)'
+        let &ft = l:cft
+        return
+    endif
+
+    if (g:spell_Toggle == 'no')
+        let g:spell_Toggle = 'es'
+        set spell spelllang=es
+        echo 'Revisión sintáctica ES (Español)'
+        let &ft = l:cft
+        return
+    endif
+
+    if (g:spell_Toggle == 'en')
+        let g:spell_Toggle = 'no'
+        set nospell
+        echo 'Spell checking DISABLED'
+        let &ft = l:cft
+        return
+    endif
+endfun
+
+let g:spell_Toggle='no'
+
+
+"" Read M$ Word documents from vim
+function! Catdoc_Clean()
+    set fileencoding=utf-8
+    exe '%s/^$\n\{4}//g'
+    normal gg
+endfun
+
+autocmd BufReadPre  *.doc   set ro
+autocmd BufReadPre  *.doc   set hlsearch!
+autocmd BufReadPost *.doc   silent %!catdoc "%"
+autocmd BufReadPost *.doc   silent! call Catdoc_Clean()
+
+autocmd BufReadPre  *.rtf   set ro
+autocmd BufReadPre  *.rtf   set hlsearch!
+autocmd BufReadPost *.rtf   silent %!catdoc "%"
+autocmd BufReadPost *.rtf   silent! call Catdoc_Clean()
+
+
+" Read man pages with colors
+runtime ftplugin/man.vim
+runtime macros/matchit.vim
+runtime info.vim
+
+
+
+""" SECTION 4: Initial settings
+filetype indent on
+filetype plugin on
+syntax enable
+" language messages en_US.UTF-8
+let g:colors_name = expand('<sfile>:t:r')
+
+set background=dark
+
+if &term == 'linux'
+    " A theme which does not kill my eyes unlike *default
+    set t_Co=8
+    colorscheme default
+else
+    set t_Co=256
+    if &term == 'xterm-256color' || &term == 'screen-256color'
+        " Avoid ugly comments if term doesn't support XFT italics
+        colorscheme railscasts
+    else
+        colorscheme railscasts-b
+    endif
+    " colorscheme darkburn
+    " colorscheme nazca
+    " colorscheme ir_black
+    " colorscheme inkpot
+endif
+
+set switchbuf=usetab,newtab
+set tabpagemax=20
+" set tabline="%N/\ %t\ %M"
+set tags=~/.local/cache/ctags/common
+set nocompatible
+set autoread
+set directory=/var/tmp "Centralized swap files
+set backupdir=/var/tmp "Centralized backups ~
+set modeline
+set esckeys
+set norightleft
+set noautowrite
+set backspace=indent,eol,start
+set encoding=utf-8
+set fileencodings=utf-8
+set fileformats=unix
+set guifont=Monaco\ Regular\ 13
+set history=30
+set omnifunc=all
+set scrolloff=9999
+set sidescrolloff=5
+set spelllang=es
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set smartcase backup expandtab
+set smarttab smartindent
+set textwidth=0
+set updatecount=200
+set updatetime=5000
+set hlsearch incsearch linebreak
+set showcmd showmatch splitbelow splitright
+set tf ai si lz sft smd sm nocul nocuc ignorecase
+set wrap
+set eadirection=ver
+set whichwrap=<,>,h,l,[,]
+set makeprg=[[\ -f\ Makefile\ ]]\ &&\ make\ \\\|\\\|\ make\ -C\ ..
+
+" Status bar hidden by default. <F11> Gets it back
+set laststatus=1
+set viminfo='200,f1,<200,:10,@10,/10,h,%
+
+"" Low priority filename suffixes for filename completion
+set wildignore+=*.dvi
+
+set suffixes+=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,
+            \.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,
+            \.toc,.class
+
+
+
+""" SECTION 5: Visual settings (appereance)
+" This settings depend on terminal colors.
+" Notice that the color theme must be defined
+" before user custom colors. Otherwise,
+" colors will be -obviously- reset
+
+fun! Paste_Insert_Mode()
+    normal "+gP
+    return 0
+endfun
+
+if has('gui_running')
+    set guioptions=m
+    set guioptions-=m
+    map <S-Insert> "+gP
+    imap <S-Insert> <C-R>=Paste_Insert_Mode()<cr>
+    colorscheme gvim_vanzan_color_diff
+    " colorscheme railscasts
+    " colorscheme nazca
+    " let g:liquidcarbon_high_contrast = 1
+    " colorscheme liquidcarbon
+    " colorscheme martin_krischik
+endif
+
+""" Theme terra
+hi Visual ctermbg=52
+hi User1 term=bold cterm=bold ctermfg=236 ctermbg=233
+hi User2 term=bold cterm=bold ctermfg=73 ctermbg=233
+hi User3 term=bold cterm=bold ctermfg=137 ctermbg=233
+hi User5 term=bold cterm=bold ctermfg=107 ctermbg=88
+hi StatusLine term=bold ctermfg=15 ctermbg=233
+hi CursorLine term=bold cterm=bold ctermfg=38 ctermbg=234
+
+""" Theme default
+" hi User1 term=bold cterm=bold ctermfg=33 ctermbg=17
+" hi User2 term=bold cterm=bold ctermfg=70 ctermbg=17
+" hi User3 term=bold cterm=bold ctermfg=39 ctermbg=17
+" hi User5 term=bold cterm=bold ctermfg=58 ctermbg=17
+" hi CursorLine term=bold cterm=bold ctermfg=33 ctermbg=17
+" hi Visual ctermbg=246
+
+
+if expand('%') != '.vimrc' && expand('%') !~ '.txt'
+    " CUSTOM programming highlights
+    hi Glitches cterm=bold ctermbg=196 ctermfg=245
+    let g = matchadd("Glitches", "[G|g][L|l][I|i][T|t][C|c][H|h][:] ", 4)
+    let t = matchadd("Glitches", "[T|t][O|o][D|d][O|o][:] ", 5)
+    let f = matchadd("Glitches", "[F|f][I|i][X|x][M|m][E|e][:] ", 3)
+endif
+
+"" Optional settings depending on custom environment
+
+if has("cscope")
+"" This one was borrowed from stackoverflow @nimrodm
+"" I did not know cscope before that.
+    set csprg=/usr/bin/cscope
+    set csto=0
+    set cscopetag
+    set nocsverb
+    cs add $CSCOPE_DB
+endif
+
+if has("folding")
+	set foldenable
+endif
+
+set statusline=%1*%F%m%r%h%w%=%(%2*%c%1*%V\ %l/%L\ %2*%P%)
+            \\ %1*[%3*%{&ff}%1*]\ [%3*%Y%1*]
+            \\ [%2*\%04.8b%1*]\ %1*[%2*\%04.4B%1*]
+            "  ascii and hex character codes, respectively.
+
+" Syntastic (syntax checker)
+set statusline+=\ %#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+
+
+""" SECTION 6: Custom mappings
+
+function! Toggle_Cursorline()
+    if &cursorline == 1
+        set nocursorline
+    else
+        set cursorline
+    endif
+    return 0
+endfun
+
+function! MakeExecutable()
+    silent! exe '!chmod ug+x ' . expand("%")
+    redraw!
+
+    if getfperm(expand("%")) =~ '^[-]*r[w]*x[r]*[w]*x'
+        echohl MoreMsg
+        echo '  --[ +x USER/GROUP ]-- '
+    elseif getfperm(expand("%")) =~ '^[-]*r[w]*x'
+        echohl MoreMsg
+        echo '  --[ +x USER/ONLY ]-- '
+    else
+        echohl WarningMsg
+        echo '  [ +x FORBIDDEN: ' . expand("%") . ' ]  '
+    endif
+
+    echohl None
+endfun
+
+function! OpenInBrowser(url)
+    let l:uri = substitute(a:url, '.*http://', 'http://', 'g')
+    silent exe '!' . $BROWSER . ' "' . l:uri . '" >/dev/null 2>&1 &'
+endfun
+
+
+" UNCOMMENT IF YOU HAVE PROBLEMS WITH FUNCTION KEYS:
+" sends <ESC><FN>
+" NOTE: Binded escapes aren't textual here, you should
+" issue <C-v><F2>, to produce the correct <F2> code.
+
+" set <F1>=[11~
+" set <F2>=[12~
+" set <F3>=[13~
+" set <F4>=[14~
+" set <F5>=[15~
+" set <F6>=[17~
+" set <F7>=[18~
+" set <F8>=[19~
+" set <F9>=[20~
+" set <F10>=[21~
+" set <F11>=[23~
+" set <F12>=[24~
+
+let mapleader = ',' " Ensure easy access to map <leader>
+
+map -       :'a,'s
+map zn      ]S
+map znn     [S
+" -------------------------------------------
+map <silent> <F1>   :call MyHTML_Align()<cr>
+map <silent> <F2>   :call Toggle_Spell()<cr>
+map <silent> <F4>   :call MyProgramHeaders(&ft)<cr>
+imap <silent> <F4>  <C-R>=MyProgramHeaders(&ft)<CR>
+map <silent> <F9>   :call Mail_Sign()<cr>
+noremap <silent>    <F3> :browse oldfiles<cr>
+noremap <silent>    <F8> :TlistToggle<cr>
+
+imap <silent> <F2>   <C-R>=Toggle_Spell()<CR>
+imap <silent> <F9>   <C-R>=Mail_Sign()<CR><BS>
+map  <silent> <F10>  :call Toggle_Cursorline()<CR>
+imap <silent> <F10>  <C-R>=Toggle_Cursorline()<CR>
+map  <silent> <F11>  :call Toggle_StatusLine()<CR>
+imap <silent> <F11>  <C-R>=Toggle_StatusLine()<CR>
+map  <silent> <F12>  :call Toggle_Paste()<CR>
+imap <silent> <F12>  <C-R>=Toggle_Paste()<CR>
+
+map <UP>    gqapi
+map <LEFT>  gqqji
+map <RIGHT> kgqji
+map !         :!
+map gN        :tabnew<cr>
+map QA        :qa<cr>
+map QAA       :qa!<cr>
+map WQ        :wq
+map WW        :w!
+nmap B        :buffers!<cr>:buf<Space>
+nmap T        :tabs<cr>
+" nmap gp :
+map <leader>g :silent call OpenInBrowser(expand("<cWORD>"))<cr>
+map <leader>x :call MakeExecutable()<cr>
+nnoremap Q @q
+
+" More flexibility for CLI and INSERT mode
+cmap <C-B> <LEFT>
+cmap <C-F> <RIGHT>
+cmap <C-A> <HOME>
+cmap <C-E> <END>
+imap <C-B> <LEFT>
+imap <C-F> <RIGHT>
+imap <C-A> <HOME>
+imap <C-E> <END>
+
+" keep selection active after indenting blocks in V mode
+vmap > >gv
+vmap < <gv
+
+" Easy edit and re-source of this ~/.vimrc file
+nmap <leader>e	:edit ~/.vimrc
+nmap <leader>s  :source ~/.vimrc
+
+" Clean comments in mercurial commit logs
+nmap <leader>u  :%s/^HG:\s*//g<cr>
+
+" My visual marks...
+sign define bookmark linehl=DiffDelete
+nnoremap <leader>M :exe 'sign place '. line(".") . 
+            \ ' name=bookmark line='.line(".").' 
+            \ buffer='.winbufnr(0)<cr>
+nnoremap <leader>N :exe 'sign unplace '.line(".")<cr>
+
+" GAWK debugger
+nnoremap <leader>G :!time gawk -W lint -f %<cr>
+
+"" Common Abreviations
+" Copyright
+iab CpR <C-R>="Copyright (C) " . strftime("%Y") . 
+            \ " " . g:user_name<cr>
+
+" Written By
+iab WbY <C-R>=" Written By: " . g:user_name . 
+            \ "\n<http://keyjunkie.blogspot.com>"<cr>
+
+" ChangeLog time entry
+iab ChL <C-R>=" -- " . g:mail_addr . "  " . 
+            \ strftime("%a %b %d %Y, %H:%M:%S")<cr>
+
+" Musical Note, LOL
+iab aRROW ▸
+iab hT ♥
+iab mN ♪
+iab mN2 ♪♪
+iab mN3 ♬
+iab mN4 ▆ ▇ ▃ ▄ ▅ ▂
+iab uTC <C-R>=system('date -u "+%a %b %d %Y,
+            \ %H:%M:%S UTC"')<cr>
+
+
+
+""" SECTION 7: Various plugin settings
+let g:ctags_statusline=1
+let g:tlist_javascript_settings = 'javascript;f:function;c:class;m:method;p:property;v:global'
+
+let g:loaded_AlignMapsPlugin = 'v41'
+
+let g:syntastic_enable_signs = 1
+let g:syntastic_quiet_warnings = 0
+let g:syntastic_disabled_filetypes = 
+            \ ['ruby', 'eruby', 'sass']
+let g:syntastic_auto_loc_list = 1
+
+" Netrw settings (file browser)
+let g:netrw_tags = 'netrw_tagged_playlist.sh'
+let g:netrw_keepdir = 0
+let g:netrw_banner = 0
+let g:netrw_browse_split = 3
+let g:netrw_browsex_viewer = '-'
+let g:netrw_fastbrowse = 1
+let g:netrw_preview  = 1
+let g:netrw_sshport  = 3200
+let g:netrw_use_errorwindow = 1
+let g:netrw_glob_escape	=' []*?`{~$'
+let g:netrw_compress = 'bzip2'
+let g:netrw_decompress = { ".gz": "gunzip",
+            \ ".bz2" : "bunzip2", ".zip" : "7z x ",
+            \ ".tar" : "tar xf ",
+            \ ".tar.gz" : "tar xf",
+            \ ".tar.bz2" : "tar xf " }
+
+" NERDcommenter
+let NERDCommentWholeLinesInVMode = 2
+let NERDRemoveExtraSpaces = 1
+let NERDSpaceDelims = 1
+let NERDCompactSexyComs = 0
+
+" VimWiki
+" -------
+" Notice most of this items aren't necessary
+" for normal operation.
+let g:vimwiki_use_mouse = 0
+let g:vimwiki_folding = 1
+let g:vimwiki_fold_lists = 1
+let g:vimwiki_fold_trailing_empty_lines = 0
+let g:vimwiki_use_calendar = 1
+let g:vimwiki_hl_cb_checked = 1
+let g:vimwiki_badsyms = ' '
+let g:vimwiki_list_ignore_newline = 1
+let g:vimwiki_table_auto_fmt = 1
+let g:vimwiki_html_header_numbering = 2
+let g:vimwiki_html_header_numbering = ''
+" let g:vimwiki_valid_html_tags =
+
+au FileType vimwiki let g:vimwiki_file_exts.=',jpg,png,jpeg,mkv'
+            " \ map  ** :s/\*\ /\ \ /g<cr>
+            " \ vmap ** :s/\*\ /\ \ /g<cr> | "FIXME, toggle Bullets
+
+function! VimwikiWeblinkHandler(link)
+    silent call OpenInBrowser(a:link)
+endfun
+
+" Local time and lang settings + global paths
+let g:tzone      = 'UTC-5'
+let g:docspath   = '~/Documentos'
+let g:wikipath   = g:docspath . '/WIKIS'
+let g:templates  = '~/Plantillas'
+let g:downloads  = '~/Descargas'
+let g:publicpath = '~/Público'
+
+" Wikis
+let todos = {}
+let todos.path = g:wikipath
+let todos.path_html = g:publicpath . '/htdocs'
+let todos.nested_syntaxes = {'sh': 'sh', 'c++': 'cpp'}
+let todos.index = 'main'
+let todos.auto_export = 0
+" let todos.html_header = 'users/todos_header.tpl'
+" let todos.html_footer = 'users/todos_footer.tpl'
+" let todos.css_name = 'css/wiki.css'
+
+let ARC = {}
+let ARC.path = g:wikipath
+let ARC.path_html = g:publicpath . '/htdocs'
+let ARC.nested_syntaxes = {'sh': 'sh', 'c++': 'cpp',
+            \ 'lua': 'lua', 'perl': 'perl'}
+let ARC.index = 'projects'
+let ARC.auto_export = 0
+" let ARC.html_header = 'users/arc_header.tpl'
+" let ARC.html_footer = 'users/arc_footer.tpl'
+" let ARC.css_name = 'css/wiki.css'
+
+let notes = {}
+let notes.path = g:wikipath
+let notes.path_html = g:publicpath . '/htdocs'
+let notes.nested_syntaxes = {}
+" let notes.nested_syntaxes = {'sh': 'sh', 'c++': 'cpp'}
+let notes.index = 'notes'
+let notes.auto_export = 0
+let notes.maxhi = 0
+" let notes.html_header = 'users/notes_header.tpl'
+" let notes.html_footer = 'users/notes_footer.tpl'
+" let notes.css_name = 'css/wiki.css'
+
+let bitacora = {}
+let bitacora.path = g:wikipath
+" let bitacora.path_html = g:publicpath . '/htdocs'
+let bitacora.nested_syntaxes = {}
+let bitacora.index = 'bitacora'
+let bitacora.auto_export = 0
+let bitacora.maxhi = 0
+" let bitacora.html_header = 'users/bitacora.header.tpl'
+" let bitacora.html_footer = 'users/bitacora.footer.tpl'
+" let bitacora.css_name = 'css/wiki.css'
+
+let lista_mercado = {}
+let lista_mercado.path = g:templates . '/lista_mercado/'
+let lista_mercado.path_html = g:publicpath . '/htdocs'
+" let lista_mercado.nested_syntaxes = {'sh': 'sh', 'c++': 'cpp'}
+let lista_mercado.index = 'main'
+let lista_mercado.auto_export = 0
+let lista_mercado.html_header = 'users/lista_mercado_header.tpl'
+let lista_mercado.html_footer = 'users/lista_mercado_footer.tpl'
+let lista_mercado.css_name = 'css/wiki.css'
+
+let g:vimwiki_list = [todos, ARC, notes, bitacora, lista_mercado] " Easy access
+
+
+" TwitVim
+" -------
+if $USER != 'root'
+    let twitvim_old_retweet = 1
+    let twitvim_browser_cmd = $BROWSER 
+    let twitvim_retweet_format = 'RT %s: %t'
+    let twitvim_enable_perl = 0
+    let twitvim_enable_python = 1
+
+    function! Switch_to_twitter_user1()
+        let &titlestring = "Twitter - code933k"
+        let g:twitvim_api_root = 'https://api.twitter.com/1'
+
+        set statusline=%1*%F%m%r%h%w%=%(%c%V\ %l/%L\ %P%)
+                    \\ Tweet\ %{strlen(getline('.'))}
+        set spell spelllang=es
+        
+        if &compatible == 0 " Vim 7.3 bug
+            MentionsTwitter
+        endif
+    endfun
+
+    function! Old_Retweet()
+        let g:twitvim_old_retweet = 1
+    endfun
+
+    function! New_Retweet()
+        let g:twitvim_old_retweet = 0
+    endfun
+
+    command! NewRT     :call New_Retweet()
+    command! OldRT     :call Old_Retweet()
+    command! Identica  :call Switch_to_identica_user1()
+    command! Twitter   :call Switch_to_twitter_user1()
+    command! Up2Picasa :ex  '!google picasa post ' . 
+                \ expand('%')
+
+    " Follow this guy, but wait for ENTER key confirmation!
+    map <leader>F   :FollowTwitter <c-r>=expand("<cword>")<cr>
+    " Open profile in default browser
+    nmap <leader>P  :silent call OpenInBrowser("http://www.twitter.com/" .
+        \ expand("<cword>"))<cr>
+
+endif
+
+" TOhtml, HTML generator
+" ----------------------
+let use_xhtml = 1
+let html_use_css = 0
+let html_ignore_folding = 1
+
+
+" eMails
+let mail_minlines = 50
+
+function! Mail_Style()
+    call Toggle_Cursorline()
+    set tw=70
+    normal 30G
+    return 0
+endfun
+
+
+" GLITCH:
+" If filetype is empty and we got a temporary file,
+" it's likely mailx has launched a Vim session.
+" This is just for having nice email highlighting.
+if expand('%') =~ '/tmp' && &ft == ''
+    setf mail
+    call Mail_Style()
+endif
+
+" ~/.vimrc ends here

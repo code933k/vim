@@ -1,0 +1,12 @@
+.
+├── README
+└── Vim
+    ├── config
+    │   └── vimrc
+    └── docs
+        ├── code933ks-guia-rápida-vim.txt
+        ├── code933ks-vim-crash-course.txt
+        ├── LEAME.txt
+        └── README.txt
+
+3 directories, 6 files
