@@ -1,0 +1,782 @@
+= CODE933K'S Vim CRASH COURSE / GUIA RÁPIDA DE TODO Vim =
+%%  Última Revisión:	sáb ene 28 2012, 15:36:50 UTC-5
+    
+{{{
+    La clave para aprender Vim es la paciencia. Cuando no
+    queda paciencia, la guía rápida de todo Vim es una
+    alternativa viable para adquirir lo más importante sin
+    dar interminables vueltas por mecánicos TIPS.
+    
+    - Tercera Revisión
+}}}    
+
+== INTRODUCCIÓN ==
+
+Si tienes café, té o aromática a la mano, este es el momento
+de calentarte una taza. En principio empezaré con el
+contexto y cada vez iré aumentando el grado "técnico", hasta
+entrar en materia para -ojalá- dejarte con conocimiento
+suficiente sobre Vim de la A a la Z.
+
+¿Lista esa taza?
+
+¡Comencemos el camino de la iluminación!
+
+
+== UN BREVE Y OJALÁ NO TAN ABURRIDO HISTÓRICO ==
+
+Supongo que ya conoces la llamada "guerra santa de los
+editores", la guerra entre Vim y Emacs. Te la resumo: muchos
+pensaron -y pensamos- que se es más productivo al mover las
+manos lo menos posible de la "posición base del teclado". El
+problema es cómo o con qué entorno de edición se hace mejor.
+
+HOME ROW:
+_Teclado latino: ASDF JKLÑ_ _Teclado US: ASDF JKL;_
+
+La solución es clara: Matar a la rata!! `:O~`
+
+    Muchas de las acciones comúnmente asociadas a la rata,
+    si no todas, se pueden reemplazar de manera más
+    *expresiva* y poderosa con un teclado.
+
+Por esto, las teclas de movimiento en Vim son `H-J-K-L`:
+
+    * `h`: Izquierda
+    * `j`: Abajo
+    * `k`: Arriba
+    * `l`: Derecha
+
+Bastante intuitivas, por cierto, y en HOME ROW. Esto evita
+que tengas que operar la rata para moverte por el texto o
+bajarlas hasta las flechas de dirección del teclado; que son
+inútiles salvo para _bind_ earlas (reasignarlas en el mapa
+de funciones) para realizar alguna acción diferente de la
+predeterminada.
+
+Eso ya convierte a Vim en un editor muy fluido y poderoso.
+
+    *EXPRESIONES CLAVE:*
+        * Menos es más: Viene de la filosofía Unix. Si tomas
+          pocas cosas que realizan una acción específica,
+          resultan casi ilimitadamente poderosas al
+          combinarlas entre sí. Vim se integra con todo el
+          sistema para lograr efectos increíbles.
+          
+        * Matar la rata: Un uso enfático e la rata (mouse)
+          para interactuar con tu computadora es
+          generalmente contra-productivo y estresa las
+          muñecas (tunel carpiano) tanto o más que la mala
+          postura de las manos y las malas costumbres de
+          escritura.
+          
+        * HOME ROW: Mantener las manos en la posición base
+          del teclado para lograr mayor descanso, velocidad
+          y efectividad.
+          
+        * Los quiero chicos -- Eric Cartman
+
+
+=== Segunda Parte ===
+
+Muchos editores se derivaron de aquellos al estilo Unix
+tradicional (tiempo en que las ratas aún no pululaban entre
+las computadoras por culpa de los malvados Mac y M$):
+
+    * VI es hijo putativo del venerable `ed`
+    * `sed` es su descendiente directo (versión GNU de ed,
+      el editor de flujo de caracteres (streams) que aún
+      encuentras en `*nix`.  Bastante recomendado para
+      tareas rápidas de edición de textos en masa.
+    * `tr` puede considerarse la versión sencilla de `sed`,
+      también disponible actualmente en todos los _sistemas
+      como Unix: BSD y sus derivados, Linux, etcétera.
+    * De `vi`, a su vez, los derivados más importantes
+      fueron `elvis` y `vim`.
+    
+ 
+Al revisar históricamente, RMS
+[http://en.wikipedia.org/wiki/Richard_stallman Richard Stallman]
+considera que VI/Vim es un hack realizado a ed para hacerlo
+lucir "más amigable". Por otro lado, Emacs (su creación) era
+la cura para todos los males.
+
+Hoy, otros pensamos distinto: 
+
+Emacs compele a muchos por ser el editor bandera de GNU dado que
+es la obra de RMS; por su poder interno, dado que está "escrito
+en Lisp" (lenguaje bastante sofisticado); y también por su
+estilo de accesibilidad (_"escapes mejorados"_).
+
+Si has usado el multiplexor de terminales _screen_, sabrás
+que `Ctrl+A` es el "escape" predefinido para comandos. Es
+decir, cada vez que presionas `CTRL+A`, envías comandos al
+interprete de _screen_ y no a la _terminal_ directamente.
+Así, Emacs diferencia entre los comandos o instrucciones que
+le pasas a él mismo (el editor de texto) y las instrucciones
+destinadas al formato del texto.  Ejemplo: `C-x C-b`, `C-c`,
+`M-x`, etc.
+
+    * ESCAPE: En programación se dice de aquello que nos
+      sirve para romper una modalidad de operación, ir de un
+      modo a otro (ej, los comentarios en un programa deben
+      marcarse o "escaparse" para que no sean leídos
+      textualmente por el interprete o compilador.
+
+Como Emacs funciona bajo el paradigma de teclas modales, a
+la manera del `CTRL+A` en screen y otros programas) muchos
+de sus usuarios no comprenden del todo el placer que
+experimentamos otros al usar Vim.
+
+
+=== Un Gran Secreto ===
+
+Ahora que llegaste a la face de iniciación, te contaré por
+qué no lo entienden: Vim se trata de *expresividad* no de
+mnemotecnia.  En mucha parte, lo que importa son los gestos
+y no los comandos en sí.
+
+Por ejemplo, para guardar un texto es importante que en
+principio recuerdes hacerlo con `:wq`. Pero después se
+integrará a tu memoria muscular y pasará a ser sólo una
+expresión más como las de tu rostro. Además, por ser modal,
+permite separar funciones de manera bastante clara. Como en
+los videojuegos: `w` para escribir (write) y `q` para salir
+(quit).
+
+    VI era un programa con "licencia no clara" y, es por
+    esto que Richard Stallman dijo las sabias palabras:
+    _"VI VI VI, es el editor del diablo"_.
+
+Sin embargo, Vim (VI Mejorado) Es un excelente editor
+escrito bajo licencia GNU/GPL, con las ventajas de los editores
+más reconocidos y fortalezas aveces mucho mayores. Sus pocas
+desventajas usualmente tienen una solución simple, a
+diferencia de otros.
+
+Ejemplos: (Sistema de referencia: openSUSE 11.3) 
+
+| Editor     | Tamaño Instalado | Extensiones y conf | Total   |
+|------------+------------------+--------------------+---------|
+| vim        | 1.8 MiB          | 8.2 MiB            | 10 MiB  |
+| emacs      | 53.5 MiB         | - indeterminado -  | 54 MiB  |
+| ooo Writer | 198.2 MiB        | - indeterminado -  | 200 MiB |
+
+Si te quedas sin modo gráfico (servidor X) o sufres un error
+similar en M$ por una charada del destino ¿Cómo lanzas
+Emacs, Eclipse, M$ Word, o notepad para arreglar el
+problema? Un editor simple, como nano, es algo útil en esas
+situaciones, pero ¿podrá ofrecer las ventajas y la velocidad
+de edición de Vim?
+
+*NOTA:* La interface base de Emacs produce errores de
+flickering con varias aceleradoras gráficas (3D) ¿Justicia
+poética? LOL!
+
+No sé qué tanta experiencia tengas con Vim, pero ahora
+empieza la acción :D
+
+
+== EXPRESIONES EN Vim ==
+
+=== Movimiento ===
+
+Ya sabes que en este editor es mucho más rápido usar `h`
+para ir a la izquierda, `j` para bajar una línea, `k` para
+subir una o más líneas y `l` para ir a la derecha.
+
+Sabrás que se logra *rompiendo el paradigma:* Vim es un
+editor multimodal, esto es, funciona en _modo normal o de
+comandos_ modo de _inserción o escritura_ y _modo visual o
+mata la rata_ :)
+
+Al presionar `<ESC>` entras al modo normal.  Recuerda que en
+`*nix`, esto también se logra con `<CTRL+[>` en caso de que
+te parezca más cómodo.
+
+    * Modo normal es el modo de comandos de edición `<ESC>`
+    * Modo de inserción `i` (más rápido) o `<INS>` (insert)
+    * Modo visual `v` o `V`
+     
+    El uso de las combinaciones arbitrarias `CTRL+C` y
+    `CTRL+V` heredado de procesadores de palabra
+    propietarios, no es necesario en Vim. A pesar de que
+    siempre puedes cambiar el mapa de teclas para que se
+    acomode a ese uso en el archivo de configuración. En
+    Internet encontrarás ejemplos. Aunque para eso la
+    humanidad inventó el "modo visual" que es mucho más
+    civilizado:
+    
+    Presionando `v` en modo normal, comienzas una
+    *selección de texto* por caracteres (desplazándote con
+    las flechas o `h-j-k-l`. Como sientas más comodidad.
+    
+    Si lo que quieres es *INDENTAR* (tabular, correr a la
+    derecha) tu selección, presiona tanto como necesites `>`
+    lo mismo que `<` para hacerlo en sentido contrario.
+    
+    Si lo que quieres es copiar tu selección: `y` (yank) es
+    lo que estabas buscando. Después de presionar `y`, Vim
+    te dejará en modo _normal_, por lo que puedes
+    desplazarte con `h-j-k-l` "normalmente" hasta el lado
+    del texto donde quieres pegar.  Luego `p` es la tecla
+    que necesitas para terminar la labor de insertar
+    (pegar/paste) el texto.
+    
+    Con `Y` (Y, mayúscula o capital) no copiarás la
+    selección de manera privada, es decir, únicamente para
+    los buffers (porciones de archivo cargados en memoria)
+    de Vim que estás usando.  En cambio, puedes copiar y
+    pegar en otras terminales con: `<Shift+INSERT>`
+    
+    *NOTA _2a_* Un detalle de vital importancia para copiar
+    y pegar textos desde fuentes externas (ej. Desde una
+    página del navegador web a Vim) es el uso de los
+    comandos:
+    
+    * `:set paste`
+    * `:set nopaste`
+    
+    `set paste` asegura que el texto mantenga un formato
+    igual o próximo al del texto original. `set no paste`
+    devuelve a Vim al modo de indentación automática.
+    
+    De hecho, cuando vayas logrando más experiencia, te
+    darás cuenta de que hay muchas formas de entrar a modo
+    de inserción y visual para más comodidad. Lo siguiente
+    lo incluyo sólo de manera informativa, no es necesario
+    practicarlo aún:
+    
+    Siempre asumiré que estás en modo normal `<ESC>`: Por
+    ejemplo, si el cursor está posicionado en medio de una
+    palabra y presionas `i` empezaras modo de inserción en
+    la posición del cursor. Si usas `o` empezaras una línea
+    más abajo. `O`, que es la negación de `o`, te pone en
+    modo de inserción _una línea más arriba_ Si usas `a`
+    (append) empezaras después del caracter donde estaba
+    parado el cursor. `A` al final de la línea, etcétera.
+
+    En modo visual ocurre algo similar: `V` mayúscula, no
+    entra a modo visual o de selección por caracteres sino
+    por párrafos.  Bastante mnemónico si piensas que
+    `<Shift>` se utiliza en computación para potenciar o
+    negar un comando. En este caso `<Shift+v>` potencia o
+    alarga la selección de caracteres a párrafos.
+   
+   Finalmente, para ir arriba del texto completo presionas
+   `gg` y para ir abajo `G`. Para ir adelante y atrás de un
+   párrafo, el mnemónico es el regex (expresiones de
+   registro estándar de Perl) `$`, final. `0` adelante. Para
+   moverte entre los inicios de las palabras, word `w`. Así,
+   `dw` "puede entenderse" como "delete word". Etcétera.
+   
+   Se me olvidaba: Deshacer es `u` (undo) y Rehacer
+   `<CTRL+R>` por defecto. Pero también puedes crear un mapa
+   nuevo en ~/.vimrc: `map r <C-R>` para usar rehacer con la
+   letra `r`, como parece más conveniente. Vim cuenta con
+   multilevel undo y, en las últimas versiones, hasta
+   undo-history el condenado.
+   
+   Ten en cuenta que la función por defecto de `r` es
+   reemplazar el caracter bajo el cursor cuando estás en
+   modo normal (`rr` sobre _o_atón, cambiaría oatón por
+   ratón)
+
+
+=== Modo Normal ===
+
+Del modo normal no encuentro mucho qué decir ya, sabes cómo
+desplazarte y cómo guardar tu texto en este modo.
+
+Una clave para guardado rápido es presionar `ZZ` (modo
+normal), que es igual (bind) al comando `:wq!`. Nota que la
+afirmación tras `:wq` significa "es imperativo". Es decir,
+salvará cambios para todo lo que estés haciendo y saldrá sin
+preguntar nada, a menos que tu archivo no tenga aún un
+nombre. Si entraste a Vim sólo escribiendo `$ vim` y no  
+`$ vim nombre_de_archivo` el editor te alertará diciendo que
+quieres guardar cambios a un archivo sin nombre.  `:wq`
+pues, es similar a `:wqa` Write-(and)-Quit-All (All, es por
+*todos* los documentos que tengas abiertos)
+
+De igual manera, `WW` sirve para guardar al estilo de `:w!` que
+significa guardar el buffer (sesión acual) sin salir.
+
+Y, finalmente, para copiar, cortar, borrar y pegar a la velocidad
+de la luz, aquí están mis *TIPS*. Que espero ya conozcas:
+
+`dd` Delete line, y luego `p` te sirve para cortar y pegar una
+línea más rápido y fácil que cualquier editor que yo conozca. `D`
+borra/corta desde la posición en la cual tienes el cursor.
+
+*NOTA:*
+Ya sabrás que los conceptos son distintos, no sólo cambian
+los nombres. Esto se debe a que Vim como `sed` es un
+editor texto de basado en streams (flujo de datos en un
+buffer o espacio en memoria) por lo cual, a diferencia de
+editores pesados y llenos de características inútiles, no
+tienes que decirle: "Salve mi trabajo cada 5 minutos". Tu
+texto está siempre guardado hasta la última letra que
+modificaste en caso de una interrupción eventual de la
+corriente eléctrica, fallo del sistema o error humano.
+
+Estos archivos de respaldo se guardan -generalmente- como
+ocultos `.nombre_archivo.swp` (swap) y no son para editar a
+mano sino binarios que guardan los diffs (diferencias) con
+el archivo original.
+
+Si usas `set backup` en `~/.vimrc` se creará además un
+archivo con los datos que tenías antes de guardar datos
+nuevos. Por ejemplo, _my_archivo.txt_ creará una copia del
+archivo "original" en _my_archivo.txt~_
+
+Aquella es una opción que me encanta, pero muchos prefieren
+usar: `set nobackup` para evitar que archivos terminados en
+`~` pululen por el disco. Yo prefiero evitar accidentes y
+borrar los backups a través de un proceso automático del
+sistema que elimina backups cuya antigüedad supera 7 días.
+
+
+=== Adenda: Línea de comandos ===
+
+Para editar varios archivos en Vim al mismo tiempo tienes
+al menos dos opciones (sabes que siempre hay más :)
+
+`vim -p archivo1 archivo2 archivo3 ..`
+Que te los abre en pestañas o "tabs" al estilo de Mozilla
+Firefox. *O* abrirlos en recuadros, "marcos", "frames" en la
+misma pantalla.
+
+`vim -o archivo1 archivo2 archivo3 ..`
+Lo hace de manera horizontal 
+
+`vim -O archivo1 archivo2 archivo3 ..`
+Con mayúscula (shift ya como negación) lo hará
+verticalmente.
+
+Ahora bien, si tienes abierto algo como esto:
+
+| A | B |
+|---+---|
+| C | D |
+
+Es decir, al abrir 4 recuadros con `$ vim -o` o `$vim -O` puedes
+desplazarte entre recuadros con `<CTRL+w>` + la tecla de la
+dirección hacia la cual quieres desplazarte.
+
+Ejemplo: La ruta de A a C es `CTRL+w` (wrap around) + `j` que es
+la tecla para ir abajo. De C a B deberías usar `CTRL+w` + `k` y
+`CTRL+w` + `l` ir arriba y luego a la derecha.
+
+Al trabajar con recuadros (mal-llamados ventanas) debes
+usar la misma combinación `CTRL+w` con `+` para agrandar su
+tamaño y `-` para disminuirlo. Las teclas "calientes" son `=`
+para hacerlos de una tamaño proporcionalmente igual y `_` para
+agrandar totalmente el cuadro en que estás actualmente. Vale para
+cuando invocas la ayuda desde un texto cualquiera que estés
+editando, puesto que Vim abre un 'recuadro' de ayuda.
+
+Para desplazarte entre Tabs, se usa `gt` hacia adelante o `gT`
+hacia atrás (Go Tab).  Para desplazarte entre muchísimas Tabs, se
+usa el número de tab `[0-9][0-9] + gt` Ej: 312gt para ir a la tab
+312 directamente. Esto claro, suponiendo que tengas 500 archivos
+abiertos al tiempo en un mainframe de la NASA y hayas nacido en
+el Olimpo :D
+
+Digamos que quieres abrir un archivo desde dentro de Vim en
+una nueva tab; en vez de un nuevo cuadro. Como expuse más
+arriba: Escribes, `:tabnew ruta/archivo` y ¡ya está!
+
+
+=== Buscar y Reemplazar ===
+
+Me gusta mucho usar una opción en el archivo de
+configuración `$HOME/.vimrc`: `set smartcase` Sirve para que
+al presionar `/` la búsqueda de texto se realice tanto para
+mayúsculas como minúsculas (intercaladas "CamelCase"
+también) Si escribes tu búsqueda en mayúsculas sólo buscará
+mayúsculas. Pero no confundirá Computadora con computadora,
+por ejemplo.  Esta opción siempre está desactivada por
+defecto, puesto que lo normal en sistemas tipo Unix es
+reconocer como distintas, aquellas palabras que se escriben
+con capitalización distinta. 
+
+Imagino que ya sabías... `?` también busca como `/` pero en
+sentido inverso. De abajo para arriba. Esto aplica a la
+mayoría de programas en un sistema como Unix, no sólo a Vim.
+
+Para reemplazar, lo más común es escribir `:%s` + el término
+a reemplazar así: `%s/gato/perro/g` la última letra g, dice
+que queremos reemplazar *todas* las ocurrencias de gato por
+perro y no sólo la primera encontrada en cada párrafo, como
+haría: `%s/gato/perro`
+
+También puedes realizar una selección visual (como para la
+mayoría de los comandos. Al seleccionar te sale un símbolo
+como este en la línea de comandos `:'<,'>`, que significa
+"rango".  Entonces, para reemplazar dentro de la selección:
+`:'<,'>s/gato/perro/g`
+
+¡Nota que la `s` ya no viene acompañada por `%`!
+
+Un rango _explícito_, sin necesidad de selección visual para
+reemplazar todas las ocurrencias de gato por perro entre las
+líneas 1 y 5 del texto, se escribe así: `:1,5s/gato/perro/g`
+
+Además hay muchas combinaciones que puedes aprender a la larga
+con `:h search-replace`  (help search replace) Todas son
+esencialmente las mismas regexp (expresiones de registro de Perl)
+usadas en grep, sed, perl, awk, C (mayormente), etc.
+
+
+=== Opciones poderosas que más uso y recuerdo ===
+
+* Hablando de frames: En modo normal puedes abrir recuadros
+  usando `:split` o `:sp` y `:vsplit` o `:vs` (separar
+  horizontal y verticalmente) Si editas un archivo muy
+  largo, puedes desplazarte a través de él en dos o más
+  puntos distintos al mismo tiempo a través de esta división
+  de la pantalla en recuadros.  Para varios archivos,
+  funciona de manera similar: Abres otro recuadro `:vsplit`
+  (quedan dos versiones del mismo archivo) y luego `:e
+  ruta/archivo2` te dejará manipular dos archivos distintos
+  en la misma pantalla. Nota: `e` es "Edit-ar".
+  
+* BookMarks: Al presionar `m` + `[a-z]` (letras de la a a la
+  z) en modo normal creas un bookmark con ese nombre. Esto
+  es, un registro para volver a esa misma línea al presionar
+  `'` (comilla simple o invertida) + la letra que escogiste.
+  También valen números `[0-9]` y, por supuesto, `[A-Z]`.
+  Pero estas marcas -en mayúscula- tienen significado
+  especial:
+  
+  Salvan marcas (marcadores) entre archivos. Es decir, te
+  sirven para ir de un archivo a otro en una línea
+  específica. La letra `m` es por Marks o Marcas.
+  
+  *Nota:*
+  La comilla simple presionada dos veces te lleva a la línea
+  que estabas editando anteriormente, si te desplazas por el
+  texto (scroll) aunque no hayas puesto una marca
+  específica. Si usas teclado en Español (con escapes) debes
+  presionar comilla, espacio, comilla.
+  
+* Macros: Macro, es un grupo de instrucciones que se
+  ejecutan de manera secuencial. Se pueden especificar desde
+  el archivo de configuración ~/.vimrc o grabar en *modo
+  normal*. Sirven para asignarle al editor acciones
+  repetitivas, puesto que resultan tediosas para nosotros.
+  
+  Grabar una macro es una operación tan sencilla como usar
+  bookmarks (marcadores de texto). Al presionar: `q` +
+  `[a-z]`, aparece la palabra *record* en la barra de estado
+  (generalmente abajo a la izquierda)
+  
+  Mientras Vim se encuentra en estado de grabación, los
+  movimientos de edición que realizas se guardan en el
+  registro con la letra que escogiste (ej. `qa` guarda el
+  registro "a" de las acciones que realices a partir de ese
+  momento)
+  
+  La grabación se detiene con `q`, cuando se ha terminado de
+  grabar la serie de acciones que se quiere repetir. Luego,
+  para invocar la macro, se presiona `@` + `[a-z]`. En este
+  caso sería `@a`. Al grabar macros debe pensarse en las
+  acciones que se realiza de tal suerte que el editor las
+  realice bien al repetirlas.
+  Para más ayuda y ejemplos: `:h macros`
+
+* Man: En *nix siempre puedes acceder al manual de cualquier
+  programa o función de C (claro, deben estar instalados...)
+  presionando `<Shift+k>` sobre la palabra con el nombre del
+  programa cuyo manual deseas leer.
+  
+* Abrir archivos: De manera similar a `man`. También puedes
+  abrir archivos fácilmente si los referencias en un texto:
+  Por ejemplo: Al escribir ~/.vimrc, si posiciono el cursor
+  sobre ese nombre, y presiono `gf` (go file) ¡voilá!
+
+  Si no he salvado el texto en que estoy trabajando
+  (este archivo) Vim se queja, dejándome saber que no abrirá otro
+  hasta que no salve este, en la mayoría de casos.
+  
+* Vim te salva la última línea en que estabas trabajando, es
+  decir, siempre que abras un archivo quedarás donde ibas.
+  Para que esto entre en efecto, el archivo de configuración
+  debe tener algo como esto `set viminfo='100,<50,s10,h`
+  habilitado. En el mío, aleluya, está por defecto.
+  Para más información sobre la información guardada en
+  viminfo y su configuración personalizada: `:h viminfo`.
+  
+* colorscheme(s): hay muchos temas de colores según tu gusto
+  personal. Sólo estando en modo normal, presionar `:`
+  (comando) + colorscheme + espacio + `<TAB>` (completar) te
+  dará una idea de todos los esquemas de color que puedes
+  usar. Obviamente, al presionar `<ENTER>` o `<INTRO>` en
+  teclado europeo, aplicará los colores inmediatamente. Mis
+  preferidos son "ir_black" (el actual para terminal)
+  "liquidcarbon" y "martin_krischik") para GVim (que nunca uso) y
+  ChocolateLiquor para ambos. Un tema y una configuración
+  que te guste y una configuración que se acomode a tu gusto
+  vale más de 1.000.000 de horas de trabajo!!
+  
+  *NOTA*
+  Aunque hay formas de mejorar la integración, los temas de
+  color no se ven igual en todas las terminales, ni mucho
+  menos en la GUI (ej. gvim, macvim) dado que GUI soporta
+  color real y la terminal CLI, generalmente desde 16 hasta
+  256. Las opciones de color de la terminal se pueden
+  modificar con t_Co=[16,88,256], respectivamente.
+  
+  Para algunas personas, que no comprenden cómo funcionan
+  los esquemas de colores en la terminal, configurar esto de
+  manera granulada puede ser algo engorroso. En Internet hay
+  muchas guías al respecto.
+  
+* Plugins: A continuación relaciono los plugins sin los que
+  no podría vivir
+  
+    # Netrw (En Vim 7.2 y 7.3, los más actuales hasta la
+      fecha, es predeterminado) Es el explorador de
+      archivos. Cuesta manejarlo -es extenso y complicado-
+      pero vale cada centavo de tu tiempo. Incluso manipula
+      archivos en red de manera "transparente" (detesto esa
+      expresión). Es decir, como si se tratase de archivos
+      en tu propio disco duro.
+      
+    # Vimoutliner: El outliner #1, (listas de TODO y
+      brainmaps) Desde hace poco no lo uso, lo he
+      reemplazado por el plugin a continuación:
+      
+    # VimWiki: !! Te maneja desde recordatorios por fecha con
+      calendario hasta una wiki personal que puedes poner en
+      línea con solo configurar un servidor web. Tu propio
+      diario personal o de notas, tu propio outliner con
+      listas de TODO como estas:
+      
+      * [o] Mis quehaceres (TODO)
+        * [X] Matar a mi vecino
+        * [ ] Sacar al perro
+        * [ ] Lavar la Chopper
+        * [ ] Terminar el programa de monitoreo
+        * [X] Matar a mi otro vecino
+        * [X] Matar a la esposa de ese vecino
+
+      Me gustaba más VimOutliner porque definía porcentajes
+      de completud (o completado), pero puedes ver que este
+      representa 50% o + con una `o` y al rededor del 75%
+      con `O`, que puedes cambiar por los símbolos que
+      quieras desde la configuración (~/.vimrc)
+      
+    # GetScript: Actualiza automágicamente las últimas
+      versiones de tus plugins personales.
+
+    # TwitVim: ¡¡Por favooor!!
+
+    # Renamer: Renombra tus archivos desde Vim. Es el
+      "renombrador" masivo más poderoso que conozco y es
+      sencillo hasta la médula.
+      
+    # Mark: Crea marcas al estilo bookmark, pero visuales.
+      Casi no lo uso, esas marcas no me resultan tan
+      prácticas. Candidato a desinstalación.
+
+    # Speeddating: No te consigue "citas amorosas rápido"
+      pero sí te sirve para incrementar y decrementar
+      correctamente las fechas que se encuentren en el texto
+      que estás editando. Ej, un ChangeLog.txt
+
+    # Info y Man: Convierten a Vim en un reemplazo colorido
+      de los comandos del sistema `man` e `info`.
+
+    # NERDCommenter: Al presionar la secuencia `,,<Space>`
+      en modo normal, te pone o quita (toggle) comentarios
+      cualquiera que sea el código fuente. Soporta
+      actualmente unos 50 lenguajes. Tcomment hace lo mismo
+      pero no es tan bueno para mí.
+      
+    # Gist y Up2picasaweb: El primero pega el texto del
+      programa en que estés trabajando en gist, de github.
+      El segundo, sube fotos a picasa web.
+      
+    # Repeat: Mejora la función repeat (que no uso mucho)
+      aunque creo que está algo viejo y Vim posiblemente ya
+      lo ha integrado. No lo sé. Después reviso. :)
+      
+    # Calendar: ¡Imperdible! Coloridos y sencillos
+      calendarios para llevar tus apuntes diarios a través
+      de VimWiki.
+
+    # Surround: ¿Un poco complicado para principiantes? No
+      lo sé, ni me interesa. Es útil para cualquiera: Añade
+      nuevas combinaciones de teclas a Vim para cambiar los
+      "alrededores" de una palabra. Por ejemplo,
+      `"alrededores"` puede cambiarse por `{{alrededores}}`
+      sin más que estar sobre la palabra y presionar `cs{{`
+      (change surround ...to {{). Yippie!!
+      
+    # Tetris: Quién puede vivir sin tetris en Vim!!?
+
+    # Mastermind: Quién puede vivir sin mastermind en Vim!!?
+
+    # Matrix: Quién puede vivir sin una simulación del
+      salvapantallas de "The Matrix" en Vim!!?
+      
+    # Mines: Para los pobres de espíritu. Lastimosamente,
+      nadie ha escrito un clon de Pacman y no soy tan
+      autoflagelante para proponerme esa labor en vimscript
+      o similares.
+    
+    # snipMate: Si quieres trabajar a la velocidad de la luz
+      cuando edites tus archivos. Este te completa
+      expresiones como si fuera un IDE. Así, no hay nada que
+      envidiarle a nadie. Creé una serie de los comandos más
+      comunes para AWK (que no estaban) en media hora. El
+      soporte para Ruby (que no uso) es brutal y para Java
+      creo que no es nada despreciable. Siempre se puede
+      implementar tu propia versión de auto-completar en un
+      abrir y cerrar de ojos para el lenguaje de
+      programación que quieras. ¡Html se escribe solo!
+
+* Mis plugins descartados:
+    # Align: Hace poco volví a instalarlo, generalmente
+      sobra, no es tan fácil de configurar y tiene citas de
+      la biblia en el código fuente, lo cual me resulta
+      inadecuado, impertinente y ofensivo aunque su autor lo
+      distribuya de manera libre. 
+    # NERDtree: Explorador de archivos que no le llega a los
+      talones a Netrw, ni es tan sencillo en su uso
+      cotidiano; pero es más popular porque el otro quizá
+      demanda más esfuerzo al inicio...
+    # Otros que no recuerdo pero hacen cosas parecidas a los
+      que menciono más arriba.
+
+
+==== Locos Comandos de Acción ====
+
+# Al escribir `:ol` o `:oldfiles` en modo normal, te muestra
+  los últimos archivos que has usado para desplazarte por
+  sus nombres y abrirlos al presionar `<ENTER>`.  `<CTRL+o>`
+  Abre el último archivo en una secuencia de los más
+  recientes. La primera acción se puede personalizar en el
+  archivo de configuración. Para saber cómo, `:h oldfiles`.
+
+* Escribe cualquier texto y luego, en modo normal :TOhtml te
+  lo convertirá a html en un archivo temporal que (si te
+  gusta) puedes salvar con :w ruta/nombre.html
+  Si lo haces en un archivo de código fuente, sorpréndete
+  notando que no necesitarás esperar a que implementen tu
+  lenguaje y tus colores favoritos en los servicios de
+  pasting gratuitos de Internet :)
+  
+* Si tienes instalado tidy, también tidyfica (embellece)
+  el código fuente que ya hayas escrito.
+
+* `:h 42` tiene todas las respuestas.
+
+* Bindings: Atributos para comandos de teclado o para
+  asignar a una tecla o combinación de teclas el mismo valor
+  que otra. Ej, `iabr WbY Written By: Mario García H.
+  <http://keyjunkie.blogspot.com>` me cambia todo el
+  contexto a Written By:... Cada vez que escribo WbY
+  en modo de inserción (iabr: iNSERT-abreviate) dentro de
+  ~/.vimrc. Aunque puedes crear abreviaturas temporales
+  desde la línea de comandos de Vim.
+  Otro ejemplo: `map <F2> :call MyTidy()` llama mi función
+  personalizada MyTidy cada vez que presiono `<F2>`. Etc.
+  Para más ayuda `:h :map`.
+  
+* Corrección ortográfica: El señalador `highlighter` de
+  palabras incorrectas depende de tu téma de colores. Este
+  te avisa en colores distintos si debería haber una
+  mayúscula tras un punto o inicio de párrafo o una
+  palabra mal escrita. De hecho, espero que esto esté
+  bien escrito porque no estoy usando el corrector
+  ortográfico :p
+  
+  Para activar la corrección:
+  `:set spell spelllang=es` = lengua española.  Sí no
+  funciona y vim se queja es porque, muy probablemente, no
+  tienes los archivos de lenguaje instalados.
+  
+  Se resuelve de la siguiente manera:
+  `mkdir -p ~/.vim/spell`
+  `cd ~/.vim/spell`
+  `wget http://ftp.roedu.net/pub/pub/packages/vim/unstable/runtime/spell/{es.latin1.sug,es.latin1.spl,en.latin1.sug,en.latin1.spl,es.utf-8.spl,es.utf-8.sug,en.utf-8.spl,en.utf-8.sug}`
+  
+  Posiblemente sobren los archivos *latin1* si tu entorno
+  está configurado para *utf8*, que es lo predefinido y
+  deseable en las distribuciones de sistemas operativos
+  libres actuales.
+  
+  *Uso corrector ortográfico:* La combinación `z=` te
+   muestra las palabras sugeridas, `zg` guarda palabras que
+   creas bien escritas y el diccionario no conozca. El resto
+   lo encuentras con: `:h spell`
+  
+* Convertidores: VimWiki convierte texto de manera casi
+  automática. Pero hay muchos convertidores para Latex, etc.
+  Incluso desde texto casi plano. ¡Yippie!
+  
+* Esqueletos: ¡Imperdible! Dentro de poco publicaré mi
+  configuración personal. Ahí están mis esqueletos con
+  derechos y licencias para escoger (beerware/GPL3/anticons)
+  según lo que escribo y detalles sobre el programa.
+  Con sólo poner en la terminal `$ vim nombre.sh` sale
+  la cabecera completa y sin esfuerzo por mi parte.
+  
+  ¡Para eso inventaron las computadoras!
+  
+  *NOTA:* Por esqueletos me refiero a "templates",
+  "plantillas" o modelos predefinidos de texto para
+   determinados archivos.
+
+-------------------------
+
+Eso es todo lo que recuerdo por ahora en un orden que creo
+medianamente adecuado.
+
+Finalmente, te habrás dado cuenta de que este texto está
+relativamente bien formateado para estar escrito en texto
+plano. Eso se debe a la `magic` line que aparece más
+abajo: `modeline`.  VimWiki le está dando formato por mí. Yo
+sólo escribo mientras VimWiki se preocupa por la indentación
+y la numeración. Cuando lo tengas instalado (si lo quieres)
+verás este texto en colores, espero que así sea.
+
+Bueno, te dejo con Vim. Creo que ya conoces el tutorial. Te
+servirá de práctica en los momentos aciagos. Si no lo
+conocías, teclea `vimtutor` en una terminal o dentro de Vim,
+`:h tutor`.
+
+-----------------------
+*NOTAS:*
+Tiempo para realizar este escrito:  02:36 horas
+Tiene 773 líneas, se puede ver en cualquier navegador web
+o editor de textos y tiene un ancho máximo de 60 caracteres
+(tw=60 abajo) con una ligera tolerancia para líneas que no
+deben aparecer partidas.
+
+*Licencia:*
+{{{
++-------------------------------------------------------- 
+|  Copyright (C) 2010-2012  Mario García H.
+|  Verbatim copying and redistribution of this contents
+|  are permitted provided this notice is preserved
+|
+|  THIS CONTENTS ARE PROVIDED AS-IS
+|  THERE IS NO WARRANTY, TO THE EXTENT PERMITTED BY LAW.
++--------------------------------------------------------
+|
+|  CONTRIBUCIONES:
+|
+|  Tae Sandoval Murgan  [ 2011/10/17 ]
+|
+|  * Sintaxis: el párrafo donde se menciona nano y una
+|    palabra faltante donde se menciona que Vim usa streams.
+|  * Correción sobre MRU (removido en favor de :ol[dfiles]
+|  * :vs|:sp (abreviaturas de :vsplit y :split)
+|  * Notas sobre los comandos anteriores para abrir archivos
+}}}
+
+vim:ft=vimwiki:tw=60:ts=4:wrap:wrapscan:norl:
